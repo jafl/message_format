@@ -33,6 +33,8 @@ import java.util.Locale;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 
 import java.text.MessageFormat;
 import java.text.ParseException;
@@ -297,6 +299,17 @@ import org.apache.commons.lang.StringEscapeUtils;
 		}
 
 		return arguments.toArray();
+	}
+
+	public Set<String> getParameterNames()
+	{
+		Set<String> names = new HashSet<String>();
+		for (String name : itsIndexNames)
+		{
+			names.add(name);
+		}
+
+		return names;
 	}
 %}
 
