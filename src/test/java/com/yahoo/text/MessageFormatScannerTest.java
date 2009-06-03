@@ -159,7 +159,6 @@ public class MessageFormatScannerTest
 		assertEquals("en", args[3]);
 	}
 
-
 	public void testFormat()
 		throws	IOException,
 				ParseException
@@ -168,5 +167,58 @@ public class MessageFormatScannerTest
 		params.put("bean", new TestBean("abc", "xyz", 3));
 		params.put("locale", theLocale);
 		assertEquals("abc xyz (3) en", MessageFormatScanner.format("{bean.s1} {bean.s2} ({bean.value}) {locale.language}", params, theLocale));
+	}
+
+	public void testArgTransformer()
+		throws	IOException,
+				ParseException
+	{
+		Object o1 = new Integer(1);
+		Object o2 = new Integer(2);
+
+		StringReader reader    = new StringReader("{a#b}");
+		MessageFormatScanner o = new MessageFormatScanner(reader);
+		o.setLocale(theLocale);
+		o.parse();
+
+		Object[] args = o.getArguments(null, null);
+		assertEquals(1, args.length);
+		assertEquals("b", args[0]);
+
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		args = o.getArguments(params, null);
+		assertEquals(1, args.length);
+		assertEquals("b", args[0]);
+
+		params.clear();
+		params.put("a", null);
+		args = o.getArguments(params, null);
+		assertEquals(1, args.length);
+		assertEquals("b", args[0]);
+
+		params.clear();
+		params.put("a", o1);
+		args = o.getArguments(params, null);
+		assertEquals(1, args.length);
+		assertEquals(o1, args[0]);
+
+		o.setArgTransformer(new MessageFormatScanner.ArgTransformer()
+		{
+			public Object transform(
+				String name,
+				Object value,
+				String formatType,
+				String formatStyle,
+				String defaultValue)
+			{
+				return "('"+value+"'?'"+value+"':'"+defaultValue+"')";
+			}
+		});
+
+		params.clear();
+		params.put("a", "x");
+		args = o.getArguments(params, null);
+		assertEquals(1, args.length);
+		assertEquals("('x'?'x':'b')", args[0]);
 	}
 }

@@ -12,8 +12,11 @@
  *  * html:       cook parameter, if it is a String
  *  * htmlstring: force conversion to String, and then cook
  *
- * It also provides the ability to specify a default FormatStyle for each
- * FormatType recognized by java.text.MessageFormat.
+ * Additional formatting of parameters can be performed by installing a
+ * class that implements the ArgTransformer interface.
+ *
+ * MessageFormatScanner also provides the ability to specify a default
+ * FormatStyle for each FormatType recognized by java.text.MessageFormat.
  *
  * Since default FormatStyles are useful even with indexed patterns, there
  * is the option to not build a parameter map, so indexed patterns will be
@@ -67,13 +70,12 @@ import org.apache.commons.lang.StringEscapeUtils;
 	private StringBuilder		itsPattern       = new StringBuilder();
 	private ArrayList<String>	itsIndexNames    = new ArrayList<String>();
 	private ArrayList<String>	itsIndexFormats  = new ArrayList<String>();
+	private ArrayList<String>	itsIndexStyles   = new ArrayList<String>();
 	private ArrayList<String>	itsIndexDefaults = new ArrayList<String>();
+	private ArgTransformer		itsArgTransformer;
 	private int					itsBraceDepth;
 	private String				itsLastFormatType;
 	private StringBuilder		itsLastDefaultValue;
-
-	// used when a parameter is not provided
-	private static final String	MISSING = "[missing parameter: {0}]";
 
 	// default FormatStyles
 	private static Map<Locale, Map>		theDefaultFormatStyles = new HashMap<Locale, Map>();
@@ -212,6 +214,16 @@ import org.apache.commons.lang.StringEscapeUtils;
 		}
 	}
 
+	public static interface ArgTransformer
+	{
+		public Object transform(
+			String name,
+			Object value,
+			String formatType,
+			String formatStyle,
+			String defaultValue);
+	}
+
 	public void setLocale(
 		Locale locale)
 	{
@@ -227,6 +239,17 @@ import org.apache.commons.lang.StringEscapeUtils;
 		boolean buildMap)
 	{
 		itsBuildMapFlag = buildMap;
+	}
+
+	public ArgTransformer getArgTransformer()
+	{
+		return itsArgTransformer;
+	}
+
+	public void setArgTransformer(
+		ArgTransformer transformer)
+	{
+		itsArgTransformer = transformer;
 	}
 
 	public String getPattern()
@@ -287,12 +310,18 @@ import org.apache.commons.lang.StringEscapeUtils;
 					arg = StringEscapeUtils.escapeHtml(arg.toString());
 				}
 
+				if (itsArgTransformer != null)
+				{
+					arg = itsArgTransformer.transform(
+						name, arg, itsIndexFormats.get(i),
+						itsIndexStyles.get(i), itsIndexDefaults.get(i));
+				}
+
 				arguments.add(arg);
 			}
 			else
 			{
 				arguments.add(itsIndexDefaults.get(i));
-//					MessageFormat.format(MISSING, new Object[] { name }));
 			}
 
 			i++;
@@ -346,6 +375,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 		itsPattern.append(itsIndexNames.size());
 		itsIndexNames.add(yytext().trim());
 		itsIndexFormats.add("");
+		itsIndexStyles.add("");
 		itsIndexDefaults.add("");
 	}
 	else
@@ -423,6 +453,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 	String formatStyle = getDefaultFormatStyle(style, itsLocale);
 	if (formatStyle != null)
 	{
+		itsIndexStyles.set(itsIndexFormats.size()-1, formatStyle);
 		itsPattern.append(formatStyle);
 		itsPattern.append("}");
 	}

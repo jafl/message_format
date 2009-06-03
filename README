@@ -13,6 +13,7 @@ following features:
       * htmlstring: both of the above
       * If you want to apply these format types to all parameters implicitly,
         use the Options object.
+   * More complex parameter transformation by implementing ArgTransformer.
    * Default FormatStyle for each FormatType, e.g., you can set the default
      style for "date" to "medium".  The default is per locale, so you can
      set the default for "number" to "#,##0.00" in en_US and "#.##0,00" in
