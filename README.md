@@ -1,4 +1,7 @@
+[![Build Status](https://secure.travis-ci.org/jafl/message_format.png?branch=master)](http://travis-ci.org/jafl/message_format)
+
 Introduction
+------------
 
 This package provides an extension to java.text.MessageFormat with the
 following features:
@@ -32,11 +35,13 @@ cache the final MessageFormat objects since they are very expensive to
 construct.
 
 Installation
+------------
 
 This package is built using Maven (http://maven.apache.org/).  Once you have
 installed Maven, simply run "mvn clean install", and it will build the jar.
 
 Dependencies
+------------
 
 This package requires the following 3rd party libraries:
 
@@ -51,6 +56,7 @@ These dependencies are automatically downloaded by Maven when the package
 is built.
 
 Notes
+-----
 
 Unfortunately, maven-jflex-plugin does not support %ctorarg, so instead of
 passing the Locale to the constructor, you have to call setLocale() after
