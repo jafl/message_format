@@ -1,5 +1,5 @@
 [![Build Status](https://secure.travis-ci.org/jafl/message_format.png?branch=master)](http://travis-ci.org/jafl/message_format)
-[![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/github/jafl/java_actor.svg?style=flat)](https://app.snyk.io/org/jafl/projects/)
+[![Vulnerabilities](https://img.shields.io/snyk/vulnerabilities/github/jafl/message_format.svg?style=flat)](https://app.snyk.io/org/jafl/projects/)
 
 Introduction
 ------------
